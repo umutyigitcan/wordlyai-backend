@@ -1,10 +1,12 @@
 package com.yigit.wordlyai.service;
 
+import com.yigit.wordlyai.dto.ChangePasswordRequest;
 import com.yigit.wordlyai.dto.LoginRequest;
 import com.yigit.wordlyai.dto.RegisterRequest;
 import com.yigit.wordlyai.entity.User;
 import com.yigit.wordlyai.exception.EmailAlreadyExistsException;
 import com.yigit.wordlyai.exception.InvalidCredentialsException;
+import com.yigit.wordlyai.exception.InvalidPasswordException;
 import com.yigit.wordlyai.exception.UserNotFoundException;
 import com.yigit.wordlyai.exception.UsernameAlreadyExistsException;
 import com.yigit.wordlyai.repository.UserRepository;
@@ -69,6 +71,27 @@ public class UserService {
     public User findById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
+    }
+
+    @Transactional
+    public User changePassword(
+            Long userId,
+            ChangePasswordRequest request
+    ) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        if (!passwordEncoder.matches(
+                request.currentPassword(),
+                user.getPasswordHash()
+        )) {
+            throw new InvalidPasswordException();
+        }
+
+        String newPasswordHash = passwordEncoder.encode(request.newPassword());
+        user.changePasswordHash(newPasswordHash);
+
+        return user;
     }
 
     @Transactional(readOnly = true)
