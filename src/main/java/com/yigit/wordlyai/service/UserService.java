@@ -3,6 +3,7 @@ package com.yigit.wordlyai.service;
 import com.yigit.wordlyai.dto.ChangePasswordRequest;
 import com.yigit.wordlyai.dto.LoginRequest;
 import com.yigit.wordlyai.dto.RegisterRequest;
+import com.yigit.wordlyai.dto.UpdateProfileRequest;
 import com.yigit.wordlyai.entity.User;
 import com.yigit.wordlyai.exception.EmailAlreadyExistsException;
 import com.yigit.wordlyai.exception.InvalidCredentialsException;
@@ -94,8 +95,34 @@ public class UserService {
         return user;
     }
 
+    @Transactional
+    public User updateProfile(
+            Long userId,
+            UpdateProfileRequest request
+    ) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        if (request.biography() != null) {
+            user.changeBiography(normalizeOptionalText(request.biography()));
+        }
+
+        if (request.profileImagePath() != null) {
+            user.changeProfileImagePath(
+                    normalizeOptionalText(request.profileImagePath())
+            );
+        }
+
+        return user;
+    }
+
     @Transactional(readOnly = true)
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    private String normalizeOptionalText(String value) {
+        String normalizedValue = value.trim();
+        return normalizedValue.isEmpty() ? null : normalizedValue;
     }
 }

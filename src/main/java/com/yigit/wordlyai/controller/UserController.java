@@ -4,6 +4,7 @@ import com.yigit.wordlyai.dto.ChangePasswordRequest;
 import com.yigit.wordlyai.dto.LoginRequest;
 import com.yigit.wordlyai.dto.LoginResponse;
 import com.yigit.wordlyai.dto.RegisterRequest;
+import com.yigit.wordlyai.dto.UpdateProfileRequest;
 import com.yigit.wordlyai.dto.UserResponse;
 import com.yigit.wordlyai.entity.User;
 import com.yigit.wordlyai.service.JwtService;
@@ -81,6 +82,17 @@ public class UserController {
     public UserResponse getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
         Long userId = getUserId(jwt);
         User user = userService.findById(userId);
+
+        return UserResponse.fromEntity(user);
+    }
+
+    @PatchMapping("/me")
+    public UserResponse updateCurrentUser(
+            @AuthenticationPrincipal Jwt jwt,
+            @Valid @RequestBody UpdateProfileRequest request
+    ) {
+        Long userId = getUserId(jwt);
+        User user = userService.updateProfile(userId, request);
 
         return UserResponse.fromEntity(user);
     }

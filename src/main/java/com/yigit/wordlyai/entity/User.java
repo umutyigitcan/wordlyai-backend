@@ -96,4 +96,12 @@ public class User {
     public void changePasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
+
+    public void changeBiography(String biography) {
+        this.biography = biography;
+    }
+
+    public void changeProfileImagePath(String profileImagePath) {
+        this.profileImagePath = profileImagePath;
+    }
 }
